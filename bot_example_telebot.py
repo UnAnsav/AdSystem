@@ -17,25 +17,25 @@ def ToAdSystem(message):
 def ForwardMessage(message): pass 
 
 # info about users
-@bot.callback_query_handler(lambda c: c.data.startswith('adholdparameters_'))    
-def AdHoldGetUsersParameters(callback_query):
+@bot.callback_query_handler(lambda c: c.data.startswith('adsystemparameters_'))    
+def AdSystemGetUsersParameters(callback_query):
     bot.answer_callback_query(callback_query.id)
     user_id = callback_query.from_user.id
     parameter = callback_query.data.split('_')[1]
     value = callback_query.data.split('_')[2]
-    bot.send_message(adsystem_host, f"adholdparameters:{user_id}:{parameter}:{value}")
+    bot.send_message(adsystem_host, f"adsystemparameters:{user_id}:{parameter}:{value}")
 
 # info about clicks
-@bot.callback_query_handler(lambda c: c.data.startswith('adholdclick_'))   
-def AdHoldClick(callback_query):
+@bot.callback_query_handler(lambda c: c.data.startswith('adsystemclick_'))   
+def AdSystemClick(callback_query):
     bot.answer_callback_query(callback_query.id)
     hash = callback_query.data.split('_')[1]
     link = callback_query.data.split('_')[2]
     user_id = callback_query.from_user.id
     bot.send_message(user_id, f"Источник: {link}")
-    bot.send_message(adsystem_host, f"adholdclick:{hash}:{user_id}")
+    bot.send_message(adsystem_host, f"adsystemclick:{hash}:{user_id}")
 
-############################################################################################### 
+############################################################################################### CODE INSERT (end)
 
 
 # example of a message_handler (just reply "Hi!") 
