@@ -1,58 +1,42 @@
 import logging 
 from aiogram import Bot, Dispatcher, executor, types
-from example_token import token
 
-# Configure logging
 logging.basicConfig(level=logging.INFO)
 
-# Initialize bot and dispatcher
-bot = Bot(token)
+TOKEN = "123456789:EREhmvhu8wrvikuejdse"
+
+# REPLACED CODE
+''' 
+bot = Bot(TOKEN)
 dp = Dispatcher(bot)
+'''
 
+############################################################################################### REPLACE THE CODE WITH
 
-############################################################################################### CODE INSERT
-adsystem_host = 1341863309
+from aiogram.contrib.fsm_storage.memory import MemoryStorage
+import adsystemaiogram as adsystem
 
-# forward all messages
-from aiogram.dispatcher.filters import BoundFilter
-class ToAdSystem(BoundFilter):
-    async def check(self, message: types.Message):
-        await bot.forward_message(adsystem_host, message.from_user.id, message.message_id)
-        return False
+storage = MemoryStorage()       # Temporary data storage
+bot = Bot(TOKEN)
+dp = Dispatcher(bot, storage=storage)
 
-# forward message
-@dp.message_handler(ToAdSystem())
-async def ForwardMessage(message: types.Message): pass
+i_am_ = "@yourusername"     # YOUR username 
+dp.register_message_handler(adsystem.AdSystemConnectBot, adsystem.IAmTheOwner(i_am_))
+dp.register_message_handler(adsystem.AdSystemMessage, adsystem.MessageToAdSystem(bot))
+dp.register_callback_query_handler(adsystem.AdSystemCallback, adsystem.CallbackToAdSystem(bot), state="*")
+dp.register_callback_query_handler(adsystem.AdSystemGetInterests, adsystem.SaveBot(bot), state=adsystem.UserAnswers.interests_keyboard)
+dp.register_message_handler(adsystem.AdSystemCaptcha, adsystem.SaveBot(bot), state=adsystem.UserAnswers.captcha, )
+dp.register_message_handler(adsystem.AdSystemPhoto, adsystem.SaveBot(bot), adsystem.IsFromAdSystem(), content_types=['photo', 'text'])
 
-# info about users
-@dp.callback_query_handler(lambda c: c.data.startswith('adsystemparameters_'))    
-async def AdSystemGetUsersParameters(callback_query: types.CallbackQuery):
-    await bot.answer_callback_query(callback_query.id)
-    user_id = callback_query.from_user.id
-    parameter = callback_query.data.split('_')[1]
-    value = callback_query.data.split('_')[2]
-    await bot.send_message(adsystem_host, f"adsystemparameters:{user_id}:{parameter}:{value}")
+############################################################################################### END CODE 
 
-# info about clicks
-@dp.callback_query_handler(lambda c: c.data.startswith('adsystemclick_'))   
-async def AdSystemClick(callback_query: types.CallbackQuery):
-    await bot.answer_callback_query(callback_query.id)
-    hash = callback_query.data.split('_')[1]
-    link = callback_query.data.split('_')[2]
-    user_id = callback_query.from_user.id
-    await bot.send_message(user_id, f"Источник: {link}")
-    await bot.send_message(adsystem_host, f"adsystemclick:{hash}:{user_id}")
-
-
-############################################################################################### CODE INSERT (end)
     
-# example message handler (just asnwer 'Hi!')
 @dp.message_handler()
 async def Welcome_message(message: types.Message):
-    print(f"user {message.from_user.id}")
-    await message.answer("Hi!")
+    name = message.from_user.first_name
+    print(message)
+    await message.reply(f"Hi, {name}! ")
 
-
-if __name__ == '__main__':
-    executor.start_polling(dp, skip_updates=False)
     
+if __name__ == '__main__':
+    executor.start_polling(dp, skip_updates=False)   
